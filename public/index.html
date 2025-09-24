@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PurchasePro - Requisition Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .login-card { width: 400px; text-align: center; }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-small { width: auto; padding: 8px 16px; font-size: 14px; }
+        .btn-secondary { background: #f8f9fa; color: #333; border: 2px solid #e1e5e9; }
+        
+        .hidden { display: none; }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-approved { background: #00b894; color: white; }
+        .status-pending { background: #fdcb6e; color: #2d3436; }
+        .status-draft { background: #ffeaa7; color: #2d3436; }
+        .status-rejected { background: #e17055; color: white; }
+        .status-requester { background: #74b9ff; color: white; }
+        .status-approver { background: #00b894; color: white; }
+        .status-admin { background: #e17055; color: white; }
+        
+        .req-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .req-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .req-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .req-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .item-input { flex: 2; }
+        .qty-input { flex: 0.5; }
+        .price-input { flex: 0.8; }
+        
+        .remove-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-btn:hover {
+            background: #d63031;
+        }
+        
+        .total { 
+            text-align: right; 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            color: #667eea; 
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        
+        .alert-error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border-color: #f5c6cb; 
+        }
+        
+        .alert-success { 
+            background: #d4edda; 
+            color: #155724; 
+            border-color: #c3e6cb; 
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .items-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .item-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .item-preview:last-child {
+            border-bottom: none;
+        }
+        
+        .approval-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .approval-actions .btn {
+            width: auto;
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .login-card { width: 90%; padding: 30px 20px; }
+            .nav-tabs { flex-wrap: wrap; }
+            .item-row { flex-direction: column; gap: 10px; }
+            .item-input, .qty-input, .price-input { flex: 1; }
+            .req-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .approval-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card card">
+            <div class="logo">PurchasePro</div>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn" id="loginBtn">
+                    Login
+                </button>
+            </form>
+            <div style="margin-top: 20px; font-size: 12px; color: #666;">
+                <p><strong>Demo Users:</strong></p>
+                <p>john_doe / password123 (Requester)</p>
+                <p>jane_smith / password123 (Approver)</p>
+                <p>admin_user / password123 (Admin)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container hidden">
+        <div class="card">
+            <div class="header">
+                <div class="logo">PurchasePro</div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span id="currentUser"></span>
+                    <span id="userRole" class="status-badge"></span>
+                    <button class="btn btn-small btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showTab('dashboard', this)">Dashboard</div>
+                <div class="nav-tab" onclick="showTab('create', this)" id="createTabNav">New Requisition</div>
+                <div class="nav-tab" onclick="showTab('approvals', this)" id="approvalsTabNav">Approvals</div>
+                <div class="nav-tab" onclick="showTab('admin', this)" id="adminTabNav">Admin</div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab">
+                <h2>My Requisitions</h2>
+                <div id="requisitionsList">
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 15px;">Loading requisitions...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Requisition Tab -->
+            <div id="createTab" class="hidden">
+                <h2>Create New Requisition</h2>
+                <form id="requisitionForm">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" id="reqTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Justification</label>
+                        <textarea id="reqJustification" rows="3" placeholder="Explain why these items are needed..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Urgency</label>
+                        <select id="reqUrgency">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Requested Delivery Date</label>
+                        <input type="date" id="reqDeliveryDate">
+                    </div>
+                    
+                    <h3>Items</h3>
+                    <div id="itemsList">
+                        <div class="item-row">
+                            <input type="text" class="item-input" placeholder="Item description" required>
+                            <input type="number" class="qty-input" placeholder="Qty" min="1" value="1" required>
+                            <input type="number" class="price-input" placeholder="Price" min="0" step="0.01">
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-small btn-secondary" onclick="addItem()">Add Item</button>
+                    <div class="total" id="totalAmount">Total: $0.00</div>
+                    
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveRequisition('draft')">Save Draft</button>
+                        <button type="submit" class="btn">Submit for Approval</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Approvals Tab -->
+            <div id="approvalsTab" class="hidden">
+                <h2>Pending Approvals</h2>
+                <div id="approvalsList">
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 15px;">Loading approvals...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div id="adminTab" class="hidden">
+                <h2>Admin Panel - All Requisitions</h2>
+                <div id="adminList">
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 15px;">Loading data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // API Helper functions
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'An error occurred');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showLoginAlert('Please enter both username and password');
+                return;
+            }
+            
+            loginBtn.innerHTML = '<div class="loading"></div>';
+            loginBtn.disabled = true;
+            
+            try {
+                const user = await apiRequest('/api/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                
+                currentUser = user;
+                showMainApp();
+                
+            } catch (error) {
+                showLoginAlert(error.message);
+            } finally {
+                loginBtn.innerHTML = 'Login';
+                loginBtn.disabled = false;
+            }
+        });
+
+        function showLoginAlert(message) {
+            document.getElementById('loginAlert').innerHTML = 
+                `<div class="alert alert-error">${message}</div>`;
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Update user info
+            document.getElementById('currentUser').textContent = 
+                `${currentUser.firstName} ${currentUser.lastName}`;
+            document.getElementById('userRole').textContent = currentUser.role.toUpperCase();
+            document.getElementById('userRole').className = `status-badge status-${currentUser.role}`;
+            
+            // Show/hide tabs based on role
+            const createTab = document.getElementById('createTabNav');
+            const approvalsTab = document.getElementById('approvalsTabNav');
+            const adminTab = document.getElementById('adminTabNav');
+            
+            createTab.style.display = ['requester', 'admin'].includes(currentUser.role) ? 'block' : 'none';
+            approvalsTab.style.display = ['approver', 'admin'].includes(currentUser.role) ? 'block' : 'none';
+            adminTab.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+            
+            // Set default delivery date
+            const deliveryDate = document.getElementById('reqDeliveryDate');
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 30);
+            deliveryDate.value = futureDate.toISOString().split('T')[0];
+            
+            loadDashboard();
+        }
+
+        async function logout() {
+            try {
+                await apiRequest('/api/logout', { method: 'POST' });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            currentUser = null;
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginAlert').innerHTML = '';
+            clearAlerts();
+        }
+
+        // Tab management
+        function showTab(tabName, element) {
+            const tabs = ['dashboard', 'create', 'approvals', 'admin'];
+            tabs.forEach(tab => {
+                document.getElementById(tab + 'Tab').style.display = 'none';
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').style.display = 'block';
+            element.classList.add('active');
+            
+            // Load content for specific tabs
+            if (tabName === 'dashboard') loadDashboard();
+            else if (tabName === 'approvals') loadApprovals();
+            else if (tabName === 'admin') loadAdmin();
+        }
+
+        // Load dashboard
+        async function loadDashboard() {
+            try {
+                const requisitions = await apiRequest('/api/requisitions');
+                displayRequisitions(requisitions, 'requisitionsList');
+            } catch (error) {
+                document.getElementById('requisitionsList').innerHTML = 
+                    `<div class="alert alert-error">Error loading requisitions: ${error.message}</div>`;
+            }
+        }
+
+        // Load approvals
+        async function loadApprovals() {
+            try {
+                const requisitions = await apiRequest('/api/requisitions/pending');
+                displayApprovalsRequisitions(requisitions);
+            } catch (error) {
+                document.getElementById('approvalsList').innerHTML = 
+                    `<div class="alert alert-error">Error loading approvals: ${error.message}</div>`;
+            }
+        }
+
+        // Load admin
+        async function loadAdmin() {
+            try {
+                const requisitions = await apiRequest('/api/requisitions');
+                displayRequisitions(requisitions, 'adminList');
+            } catch (error) {
+                document.getElementById('adminList').innerHTML = 
+                    `<div class="alert alert-error">Error loading data: ${error.message}</div>`;
+            }
+        }
+
+        function displayRequisitions(requisitions, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (requisitions.length === 0) {
+                container.innerHTML = '<p>No requisitions found.</p>';
+                return;
+            }
+            
+            const html = requisitions.map(req => `
+                <div class="req-card">
+                    <div class="req-header">
+                        <div>
+                            <div class="req-number">${req.requisition_number}</div>
+                            <div>${req.title}</div>
+                            <small>By: ${req.first_name} ${req.last_name}</small>
+                        </div>
+                        <div class="status-badge status-${req.status}">${req.status}</div>
+                    </div>
+                    <p><strong>Items:</strong> ${req.items ? req.items.length : 0} item(s)</p>
+                    <p><strong>Total:</strong> $${parseFloat(req.total_amount || 0).toFixed(2)}</p>
+                    <p><strong>Urgency:</strong> ${req.urgency}</p>
+                    <p><strong>Created:</strong> ${new Date(req.created_at).toLocaleDateString()}</p>
+                    ${req.justification ? `<p><strong>Justification:</strong> ${req.justification}</p>` : ''}
+                    ${req.items && req.items.length > 0 ? `
+                        <div class="items-preview">
+                            <strong>Items:</strong>
+                            ${req.items.map(item => `
+                                <div class="item-preview">
+                                    <span>${item.item_description}</span>
+                                    <span>Qty: ${item.quantity} × $${parseFloat(item.unit_price || 0).toFixed(2)} = $${parseFloat(item.total_price || 0).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function displayApprovalsRequisitions(requisitions) {
+            const container = document.getElementById('approvalsList');
+            
+            if (requisitions.length === 0) {
+                container.innerHTML = '<p>No pending approvals.</p>';
+                return;
+            }
+            
+            const html = requisitions.map(req => `
+                <div class="req-card">
+                    <div class="req-header">
+                        <div>
+                            <div class="req-number">${req.requisition_number}</div>
+                            <div>${req.title}</div>
+                            <small>Requested by: ${req.first_name} ${req.last_name}</small>
+                        </div>
+                        <div class="status-badge status-${req.status}">${req.status}</div>
+                    </div>
+                    <p><strong>Total:</strong> $${parseFloat(req.total_amount || 0).toFixed(2)}</p>
+                    <p><strong>Urgency:</strong> ${req.urgency.toUpperCase()}</p>
+                    <p><strong>Delivery Date:</strong> ${req.requested_delivery_date || 'Not specified'}</p>
+                    ${req.justification ? `<p><strong>Justification:</strong> ${req.justification}</p>` : ''}
+                    ${req.items && req.items.length > 0 ? `
+                        <div class="items-preview">
+                            <strong>Items:</strong>
+                            ${req.items.map(item => `
+                                <div class="item-preview">
+                                    <span>${item.item_description}</span>
+                                    <span>Qty: ${item.quantity} × $${parseFloat(item.unit_price || 0).toFixed(2)} = $${parseFloat(item.total_price || 0).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="approval-actions">
+                        <button class="btn" onclick="approveRequisition(${req.id})">Approve</button>
+                        <button class="btn btn-secondary" onclick="rejectRequisition(${req.id})">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // Requisition management
+        function addItem() {
+            const itemsList = document.getElementById('itemsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'item-row';
+            newItem.innerHTML = `
+                <input type="text" class="item-input" placeholder="Item description" required>
+                <input type="number" class="qty-input" placeholder="Qty" min="1" value="1" required>
+                <input type="number" class="price-input" placeholder="Price" min="0" step="0.01">
+                <button type="button" class="remove-btn" onclick="removeItem(this)">Remove</button>
+            `;
+            itemsList.appendChild(newItem);
+            updateTotal();
+        }
+
+        function removeItem(button) {
+            const itemRows = document.querySelectorAll('.item-row');
+            if (itemRows.length > 1) {
+                button.closest('.item-row').remove();
+                updateTotal();
+            }
+        }
+
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                const price = parseFloat(row.querySelector('.price-input').value) || 0;
+                total += qty * price;
+            });
+            document.getElementById('totalAmount').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Form submission
+        document.getElementById('requisitionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveRequisition('submitted');
+        });
+
+        async function saveRequisition(status) {
+            const title = document.getElementById('reqTitle').value;
+            const justification = document.getElementById('reqJustification').value;
+            const urgency = document.getElementById('reqUrgency').value;
+            const requestedDeliveryDate = document.getElementById('reqDeliveryDate').value;
+            
+            if (!title.trim()) {
+                showAlert('Please enter a title', 'error');
+                return;
+            }
+            
+            // Collect items
+            const items = [];
+            const itemRows = document.querySelectorAll('.item-row');
+            
+            for (const row of itemRows) {
+                const description = row.querySelector('.item-input').value.trim();
+                const quantity = parseInt(row.querySelector('.qty-input').value) || 1;
+                const unitPrice = parseFloat(row.querySelector('.price-input').value) || 0;
+                
+                if (description) {
+                    items.push({ description, quantity, unitPrice });
+                }
+            }
+            
+            if (items.length === 0) {
+                showAlert('Please add at least one item', 'error');
+                return;
+            }
+            
+            try {
+                const result = await apiRequest('/api/requisitions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        title,
+                        justification,
+                        urgency,
+                        requestedDeliveryDate,
+                        items,
+                        status
+                    })
+                });
+                
+                showAlert(result.message, 'success');
+                
+                if (status === 'submitted') {
+                    // Reset form
+                    document.getElementById('requisitionForm').reset();
+                    document.getElementById('itemsList').innerHTML = `
+                        <div class="item-row">
+                            <input type="text" class="item-input" placeholder="Item description" required>
+                            <input type="number" class="qty-input" placeholder="Qty" min="1" value="1" required>
+                            <input type="number" class="price-input" placeholder="Price" min="0" step="0.01">
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    `;
+                    updateTotal();
+                    
+                    // Set default delivery date
+                    const deliveryDate = document.getElementById('reqDeliveryDate');
+                    const futureDate = new Date();
+                    futureDate.setDate(futureDate.getDate() + 30);
+                    deliveryDate.value = futureDate.toISOString().split('T')[0];
+                }
+                
+                loadDashboard();
+                
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Approval functions
+        async function approveRequisition(reqId) {
+            try {
+                const result = await apiRequest(`/api/requisitions/${reqId}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        status: 'approved',
+                        comments: 'Approved via web interface'
+                    })
+                });
+                
+                showAlert(result.message, 'success');
+                loadApprovals();
+                loadDashboard();
+                
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function rejectRequisition(reqId) {
+            const reason = prompt('Please provide a reason for rejection:');
+            if (!reason) return;
+            
+            try {
+                const result = await apiRequest(`/api/requisitions/${reqId}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        status: 'rejected',
+                        comments: reason
+                    })
+                });
+                
+                showAlert(result.message, 'success');
+                loadApprovals();
+                loadDashboard();
+                
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function clearAlerts() {
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+        // Auto-update total when inputs change
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('.qty-input, .price-input')) {
+                updateTotal();
+            }
+        });
+
+        // Initialize total calculation
+        document.addEventListener('DOMContentLoaded', updateTotal);
+    </script>
+</body>
+</html>
